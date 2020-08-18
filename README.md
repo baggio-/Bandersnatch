@@ -17,3 +17,4 @@ I also trid to add timers, as in the original movie on Netflix you have ony 10 s
 However I successfully failed at that.
 
 Anyways, enjoy! It's fun to explore all the endings, especially if you enjoyed the movie.
+Open issues to see some screenshots (spoiler alert!)
