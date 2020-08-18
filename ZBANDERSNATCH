@@ -1,0 +1,2514 @@
+*&---------------------------------------------------------------------*
+*& Report ZBANDERSNATCH
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zbandersnatch.
+*** { Aidar 31.01.2019 09:48:17
+*--------------------------------------------------------------------*
+*--------------------------------------------------------------------*
+*--------------------------------------------------------------------*
+** Welcome to the interactive movie Bandersnatch (Black Mirror). The brilliance
+*** of this 'thing' is that you get to control the main protoganist's actions
+*** Thus deciding the plot of the movie.
+*** Pay close attention to the plot, as during the game( meta - movie ) the rules
+*** will be explained.
+***
+*** Do NOT pick the wrong path, MATE.
+***
+*** Good Luck!!!
+*--------------------------------------------------------------------*
+*--------------------------------------------------------------------*
+*** } Aidar
+
+
+DATA: c_intro   TYPE string,
+      c_help    TYPE string,
+      lv_answer(1) TYPE c,
+      counter   TYPE i,
+      num_end   TYPE i.
+
+FIELD-SYMBOLS: <fs_field_lsd_eq_2> TYPE any,
+               <fs_field_killColin_eq_2> TYPE c,
+               <fs_field_burn_body> TYPE i.
+
+
+*** { Aidar 11.06.2019 15:19:21 GUI TIMER CLASS
+*PARAMETERS p_time type t DEFAULT 10.
+
+CLASS my DEFINITION.
+
+PUBLIC SECTION.
+
+METHODS : run_handler FOR EVENT finished OF cl_gui_timer.
+
+ENDCLASS.
+
+DATA timer TYPE REF TO cl_gui_timer.
+DATA myh TYPE REF TO my.
+
+CLASS my IMPLEMENTATION.
+METHOD run_handler.
+
+"This method will be called whenever the time interval which is set by us as 1 “second will be over
+
+CALL METHOD timer->run.
+
+call method CL_GUI_CFW=>SET_NEW_OK_CODE
+EXPORTING
+new_code = 'REFR'.
+ENDMETHOD.
+
+ENDCLASS. "my IMPLEMENTATION
+
+at SELECTION-SCREEN OUTPUT.
+*p_time = p_time - 1.
+
+*CREATE OBJECT timer.
+*CREATE OBJECT myh.
+*timer->interval = '1'.
+*PERFORM beginning.
+*CALL METHOD timer->run.
+*SET HANDLER myh->run_handler FOR ALL INSTANCES.
+*** } Aidar
+
+DATA: c_intro   TYPE string,
+      c_help    TYPE string,
+      lv_answer TYPE c LENGTH 1,
+      counter   TYPE i,
+      num_end   TYPE i.
+
+FIELD-SYMBOLS: <fs_field_lsd_eq_2> TYPE any,
+               <fs_field_killColin_eq_2> TYPE c,
+               <fs_field_burn_body> TYPE i.
+
+" working class
+
+CLASS start_again DEFINITION.
+  PUBLIC SECTION.
+  DATA: mv_var TYPE i.
+  CLASS-METHODS: doit.
+
+ ENDCLASS.
+
+ CLASS start_again IMPLEMENTATION.
+   METHOD doit.
+     PERFORM beginning.
+     "here will be some method that will start the game again
+     " however keeping on mind all the endings
+ENDMETHOD.
+ENDCLASS.
+
+
+
+
+" buttons on top, but works only with parameters
+
+*TABLES sscrfields.
+*
+*INITIALIZATION.
+*PARAMETERS p1.
+*
+*SELECTION-SCREEN: FUNCTION KEY 1.
+*sscrfields-functxt_01 = 'Начать заново'(s01).
+*SELECTION-SCREEN: FUNCTION KEY 2.
+*sscrfields-functxt_02 = value smp_dyntxt( icon_id = icon_cancel icon_text  = 'выход'(s02) ).
+*
+*
+*at selection-screen.
+*  case sy-ucomm.
+*    when'FC01'.
+*      clear: lv_answer, <fs_field_lsd_eq_2>, <fs_field_killColin_eq_2>, counter.
+*      SUBMIT zbandersnatch VIA SELECTION-SCREEN AND RETURN.
+** >>> 002
+*    when'FC02'.
+*      perform konec.
+** <<< 002
+*  endcase.
+*
+
+** Begin of the 'game'
+
+*TABLES sscrfields.
+*
+*SELECTION-SCREEN:
+*  BEGIN OF SCREEN 500 AS WINDOW TITLE title,
+*    PUSHBUTTON 2(10)  but1 USER-COMMAND cli1,
+*    PUSHBUTTON 12(30) but2 USER-COMMAND cli2
+*                           VISIBLE LENGTH 10,
+*  END OF SCREEN 500.
+*
+*AT SELECTION-SCREEN.
+*  CASE sscrfields.
+*    WHEN 'CLI1'.
+*      ...
+*    WHEN 'CLI2'.
+*      ...
+*  ENDCASE.
+
+*START-OF-SELECTION.
+*  title  = 'Push button'.
+*  but1 = 'Button 1'.
+*
+*  CALL FUNCTION 'ICON_CREATE'
+*    EXPORTING
+*      name   = icon_information
+*      text   = 'Button 2'
+*      info   = 'My quick info'
+*    IMPORTING
+*      RESULT = but2
+*    EXCEPTIONS
+*      OTHERS = 0.
+
+START-OF-SELECTION.
+
+
+PERFORM popup_display_text.
+PERFORM popup_display_text1.
+PERFORM beginning.
+
+FORM beginning.
+PERFORM q1.  " завтрак (meaningless)
+PERFORM q2.  " Музыка в автобусе (meaningless)
+PERFORM q3.  " Работа в офисе/дома (после оканчания 10 мин олжно пройти)
+*** { Aidar 10.02.2019 17:49:17
+*PERFORM q4.  " Говорить о матери с психологом
+*there should not be any choices. first do not talk, after lsd - you can talk
+*** } Aidar
+*10MINS passed while talking to Haynes
+PERFORM q5.  " Какой альбом купить (meaningless)
+PERFORM q6.  " Пролить чай на клавиатуру или наорать на отца
+
+PERFORM q7.
+ENDFORM.
+
+*--------------------------------FORMS-------------------------------------------*
+
+** experimental { Aidar 03.02.2019 23:35:08
+*DATA: lv_titlebar TYPE string,
+*      lv_q        TYPE string,
+*      lv_a        TYPE string,
+*      lv_q_a1     TYPE string,
+*      lv_q_a2     TYPE string,
+*      lv_q1       TYPE char12,
+*      lv_q2       TYPE string.
+*
+*DATA: lv_q11 TYPE REF TO string,
+*      lv_q22 TYPE REF TO data.
+*
+*
+
+*               <fs_field_q_a2> TYPE any,
+*               <fs_field_q> TYPE string,
+*               <fs_field_q1> TYPE any,
+*               <fs_field_q2> TYPE any,
+*               <fs_field_lv_titlebar> TYPE string,
+*               <fs_field_lv_q> TYPE string.
+*FORM question.
+*
+*ASSIGN lv_titlebar to <fs_field_lv_titlebar>.
+*ASSIGN lv_q to <fs_field_lv_q>.
+*ASSIGN lv_q1 to <fs_field_q1>.
+*ASSIGN lv_q2 to <fs_field_q2>.
+*   CALL FUNCTION 'POPUP_TO_CONFIRM'
+*    EXPORTING
+*      titlebar              = <fs_field_lv_titlebar>
+*      text_question         = <fs_field_lv_q>
+*      text_button_1         = <fs_field_q1>(001)
+*      text_button_2         = 'isnt this c(2)'(002)
+*      default_button        = '1'
+*      display_cancel_button = 'X'
+*     START_COLUMN          = 25
+*     START_ROW             = 6
+*    IMPORTING
+*      answer                = lv_a
+*    EXCEPTIONS
+*      text_not_found        = 1
+*      OTHERS                = 2.
+*  IF sy-subrc <> 0.
+*    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+*            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+*  ENDIF.
+*ENDFORM.
+*
+** { Aidar 04.02.2019 11:41:23
+**experimental
+*
+*START-OF-SELECTION.
+*lv_titlebar = 'titebar'.
+*lv_q = 'question'.
+*lv_q1 = '1answer1'.
+*lv_q2 = '2answer2'.
+*lv_q_a1 = 'PERFORM q1_a12'.
+*q_a12 = 'PERFORM q1_a12'.
+*PERFORM question.
+*  IF lv_answer = '1'.
+*   call FUNCTION lv_q_a1.
+*  ELSEIF lv_answer = '2'.
+*  call FUNCTION lv_q_a1.
+*  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+*  ENDIF.
+** } Aidar experimental end
+
+
+
+
+
+FORM konec.
+  if num_end gt 10.
+  DATA(lv_str) = 'Конец фильма. Спасибо за просмотр'.
+  MESSAGE lv_str TYPE 'I'.
+  ELSE.
+  NEW-LINE.
+  DATA(lv_strr) = | 'Вы просмотрели' { num_end } 'разных сюжетных линии' |.
+  DATA(lv_title) = ' Посмотреть все остальные концовки? '.
+  MESSAGE lv_strr TYPE 'I'.
+   CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = lv_title
+      text_question         = lv_title
+      text_button_1         = 'Yes'(001)
+*     icon_button_1         = 'green'
+      text_button_2         = 'No'(002)
+*     icon_button_2         = 'red'
+      default_button        = '1'
+*      display_cancel_button = 'X'
+*     USERDEFINED_F1_HELP   = ' '
+     START_COLUMN          = 25
+     START_ROW             = 6
+*     POPUP_TYPE            =
+    IMPORTING
+      answer                = lv_answer
+* TABLES
+*     PARAMETER             =
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = 1.
+      CALL METHOD start_again=>doit.
+    ELSE." lv_answer = 2.
+    MESSAGE 'Good Bye, MF' TYPE 'A'.
+      "ideally should go back to the last question, but how?
+  ENDIF.
+
+  STOP.
+  ENDIF.
+  ENDFORM.
+
+FORM cancel.
+  MESSAGE 'Wrong Path, MATE' TYPE 'I'.
+
+    CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Wrong Path, Mate'
+      text_question         = 'Exit? Are you sure?'
+      text_button_1         = 'Yes'(001)
+*     icon_button_1         = 'green'
+      text_button_2         = 'No'(002)
+*     icon_button_2         = 'red'
+      default_button        = '1'
+      display_cancel_button = ''
+*     USERDEFINED_F1_HELP   = ' '
+     START_COLUMN          = 25
+     START_ROW             = 6
+*     POPUP_TYPE            =
+    IMPORTING
+      answer                = lv_answer
+* TABLES
+*     PARAMETER             =
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = 1.
+    MESSAGE 'Good Bye, MF' TYPE 'E'.
+    ELSEIF lv_answer = 2.
+      PERFORM beginning.
+      "ideally should go back to the last question, but how?
+  ENDIF.
+
+
+
+ENDFORM.
+
+FORM popup_display_text. " intro to the ABAP game
+  " displaying popup text Aidar 31.01.2019 10:18:54
+  CALL FUNCTION 'POPUP_DISPLAY_TEXT'
+    EXPORTING
+      language     = sy-langu
+      popup_title  = 'BANDERSNATCH'
+      start_column = 10
+      start_row    = 3
+      text_object  = 'BANDERSNATCH_INTRO'.
+*   HELP_MODAL           = 'X'
+* IMPORTING
+*   CANCELLED            =
+* EXCEPTIONS
+*   TEXT_NOT_FOUND       = 1
+*   OTHERS               = 2
+  .
+  IF sy-subrc <> 0.
+* Implement suitable error handling here
+    MESSAGE 'Wrong path, MATE' TYPE 'E'.
+  ENDIF.
+ENDFORM.
+
+
+FORM popup_display_text1. " Plot Intro
+  " displaying popup text Aidar 31.01.2019 10:18:54
+  CALL FUNCTION 'POPUP_DISPLAY_TEXT'
+    EXPORTING
+      language     = sy-langu
+      popup_title  = 'BANDERSNATCH'
+      start_column = 10
+      start_row    = 3
+      text_object  = 'BANDERSNATCH_INTRO_PLOT'.
+*   HELP_MODAL           = 'X'
+* IMPORTING
+*   CANCELLED            =
+* EXCEPTIONS
+*   TEXT_NOT_FOUND       = 1
+*   OTHERS               = 2
+  .
+  IF sy-subrc <> 0.
+* Implement suitable error handling here
+    MESSAGE 'Wrong path, MATE' TYPE 'E'.
+  ENDIF.
+ENDFORM.
+
+
+FORM q1. " breakfast?
+
+  MESSAGE 'Стефан утром просыпается. Отец ему готовит завтрак' TYPE 'I'.
+
+
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Завтрак'
+      text_question         = 'Что на завтрак следует выбрать главному герою?'
+      text_button_1         = 'Frosties'(001)
+*     icon_button_1         = 'green'
+      text_button_2         = 'Sugar Puffs'(002)
+*     icon_button_2         = 'red'
+      default_button        = '1'
+      display_cancel_button = 'X'
+*     USERDEFINED_F1_HELP   = ' '
+     START_COLUMN          = 25
+     START_ROW             = 6
+*     POPUP_TYPE            =
+    IMPORTING
+      answer                = lv_answer
+* TABLES
+*     PARAMETER             =
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q1_a12.
+  ELSEIF lv_answer = '2'.
+    PERFORM q1_a12.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Come back ASAP'.
+    PERFORM cancel.
+  ENDIF.
+ENDFORM.
+
+
+
+FORM q1_a12. " breakfast talk
+  CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Breakfast'
+    txt1          = 'Завтрак готов. Стефан задумался. Они говорят о предстоящем интервью и о его игре'
+    txt2          = 'Отец расспрашивает про игру. Стефан рассказывает что игра по книге JFD (автор)'
+    txt3          = 'Jerome F Davies - Bandersnatch. И что он нашел книгу в вещах Матери'
+    txt4          = ' и говорит что эта книге с выбором событий, ты решаешь судьбу персонажа.'
+          .
+      CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Breakfast'
+    txt1          = 'Они увидели соседскую собаку, которая проникла и копает в саду. Отец:'
+    txt3          = 'Стефан доедает свой завтрак и направляется к Tuckersoft.'
+    txt4          = 'Садится в автобусе. Включает свой музыкальный плеер и думает что послушать.'
+    txt2          = '"Долбаная соседская псина. Давай-давай! Вгоняй нас в гроб."'
+          .
+ENDFORM.
+
+
+FORM q2. " music?
+clear lv_answer.
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Музыка'
+      text_question         = 'Кассету какой группы ему достать?'
+      text_button_1         = 'ThompsonTwins'(001)
+*     icon_button_1         = 'green'
+      text_button_2         = 'Now 2'(002)
+*     icon_button_2         = 'red'
+      default_button        = '1'
+      display_cancel_button = 'X'
+*     USERDEFINED_F1_HELP   = ' '
+     START_COLUMN          = 25
+     START_ROW             = 6
+*     POPUP_TYPE            =
+    IMPORTING
+      answer                = lv_answer
+* TABLES
+*     PARAMETER             =
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q2_a12.
+  ELSEIF lv_answer = '2'.
+    PERFORM q2_a12.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+ENDFORM.
+
+
+FORM q2_a12.
+  CALL FUNCTION 'POPUP_TO_INFORM'
+    EXPORTING
+      titel         = ''
+      txt1          = 'Играет песня. В Tuckersoft-е Стефан и Мохан после знакомства идут к Колину.'
+      txt2          = 'У Колина(знаменитый разраб) баг в игре и определяет ошибку - оишбка в буфере.'
+     TXT3          = 'Стефан начинает рассказывать о своей игре (по одноименной книге - Bandersnatch)'
+     TXT4          = 'У Колина есть эта книга, но он ее не читал. Мохан предлагает Стефану работу.'
+            .
+  ENDFORM.
+
+
+  FORM q3. " office or home?
+clear lv_answer.
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Job Offer'
+      text_question         = 'Работать в офисе или дома?'
+      text_button_1         = 'Офис'(001)
+*     icon_button_1         = 'green'
+      text_button_2         = 'Дома'(002)
+*     icon_button_2         = 'red'
+      default_button        = '1'
+      display_cancel_button = 'X'
+*     USERDEFINED_F1_HELP   = ' '
+     START_COLUMN          = 25
+     START_ROW             = 6
+*     POPUP_TYPE            =
+    IMPORTING
+      answer                = lv_answer
+* TABLES
+*     PARAMETER             =
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q3_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q3_a2.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+ENDFORM.
+
+
+FORM q3_a1. "office  10MINS passed
+  counter = 10.
+  CALL FUNCTION 'POPUP_TO_INFORM'
+    EXPORTING
+      titel         = 'Работа в офисе'
+      txt1          = 'Колин говорит Стефану, что он выбрал НЕправильный путь.'
+      txt2          = 'Колин начинает работать в офисе над своей игрой'
+     TXT3          = 'Спустя 5 месяцев игра выходит и набирает рэйтинг: 0 из 5'
+     TXT4          = 'Стефан начинает все заново.'
+            .
+      counter = counter + 10.
+   PERFORM popup_display_text1.
+   PERFORM q1.
+   PERFORM q2_2.
+  ENDFORM.
+
+FORM q2_2. "music? (x2)
+clear lv_answer.
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Музыка'
+      text_question         = 'Кассету какой группы ему достать?'
+      text_button_1         = 'ThompsonTwins'(001)
+*     icon_button_1         = 'green'
+      text_button_2         = 'Now 2'(002)
+*     icon_button_2         = 'red'
+      default_button        = '1'
+      display_cancel_button = 'X'
+*     USERDEFINED_F1_HELP   = ' '
+     START_COLUMN          = 25
+     START_ROW             = 6
+*     POPUP_TYPE            =
+    IMPORTING
+      answer                = lv_answer
+* TABLES
+*     PARAMETER             =
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q2_2_a12.
+  ELSEIF lv_answer = '2'.
+    PERFORM q2_a12.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+ENDFORM.
+
+
+FORM q2_2_a12.
+  CALL FUNCTION 'POPUP_TO_INFORM'
+    EXPORTING
+      titel         = 'TuckerSoft'
+      txt1          = 'Играет песня. В Tuckersoft-е Стефан и Мохан после знакомства идут к Колину'
+      txt2          = 'Колин справшивает Стефана не встречались они ранее. Стефан отвечает что Нет.'
+      TXT3          = 'У Колина баг в игре, Стефан определяет - ошибка в буфере. Мохан впечетлен'
+      TXT4          = 'Колина говорит что читал книгу Bandersnatch. Мохан предлагает Стефану работу.'
+            .
+            PERFORM q3.
+  ENDFORM.
+
+
+FORM q3_a2.
+  CALL FUNCTION 'POPUP_TO_INFORM'
+    EXPORTING
+      titel         = 'Работа из дома'
+      txt1          = 'Колин одобряет этот выбор и говорит что немного безумства это то что нужно. '
+      txt2          = 'Дедлайн 12 сентября. Стефан будет разрабатывать игру один дома'
+     TXT3          = 'Колин рекомендует музыку Стефану чтобы войту в Зону'
+     TXT4          = 'Стефан нарравляется домой и рассказывает все своему отцу'
+            .
+
+
+ CALL FUNCTION 'POPUP_TO_INFORM'
+    EXPORTING
+      titel         = 'Визит к психологу'
+      txt1          = 'Стефан посещает своего психолога Доктора Хэйнес. У него начинается глюки '
+      txt2          = 'Стефан говорит что его отец "Иногда нервирует его"'
+     TXT3          = 'Стефан также рассказывает об ощущении будто за ним наблюдают'
+     TXT4          = 'Далее тема зашла о матери Стефана. О том что произошло много лет назад'
+            .
+PERFORM q4_a1.
+  ENDFORM.
+
+
+ FORM q4. " talk about mom?
+clear lv_answer.
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Разговор о матери'
+      text_question         = 'Стоит ли Стефану говорить о матери?'
+      text_button_1         = 'Да'(001)
+      text_button_2         = 'Нет'(002)
+      default_button        = '2'
+      display_cancel_button = 'X'
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q4_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q4_a2.
+  ELSEIF lv_answer = 'A'.
+    WRITE: /'Abort mission it is'.
+  ENDIF.
+ENDFORM.
+
+
+" Если говорить о матери
+FORM q4_a1.
+  CALL FUNCTION 'POPUP_TO_INFORM'
+    EXPORTING
+      titel         = 'Разговор о матери: Да'
+      txt1          = 'Стефану 5 лет. История про любимую игрушку(кролик) Стефана, с которой он спит.'
+      txt2          = 'Ночью его отец забирает кролика пока Стефан спит. Ибо игрушка не по-мужски.'
+     TXT3           = 'След утро он не может найти его. Мама собирается ехать вместо со Стефаном.'
+     TXT4           = 'Но он не хочет ехать без игрушки.'
+            .
+     PERFORM q4_1_a2.
+  ENDFORM.
+
+FORM q4_1. " go with mom to die?
+clear lv_answer.
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Идти с мамой?'
+      text_question         = 'Стоит ли маленькому Стефану ехать с мамой?'
+      text_button_1         = 'Да'(001)
+      text_button_2         = 'Нет'(002)
+      default_button        = '1'
+      display_cancel_button = 'X'
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q4_1_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q4_1_a2.
+  ELSEIF lv_answer = 'A'.
+    WRITE: /'Abort mission it is'.
+  ENDIF.
+ENDFORM.
+
+
+FORM q4_1_a1. " went with mom and died at Dr's office
+  CALL FUNCTION 'POPUP_TO_INFORM'
+    EXPORTING
+      titel         = 'Маленький Стефан поехал с мамой'
+      txt1          = 'Так как Стефан искал свою игрушку, они опаздывают на поезд в 8:30 утра'
+      txt2          = 'Стефан, Мама и кролик садяться на поезд в 8:45 утра'
+     TXT3           = 'Время обратно перематывается: Стефан умирает во время приема у психоога'
+     TXT4           = 'Она не понимает и говорит что он всего лишь закрыл глаза.'
+
+            .
+
+   CALL FUNCTION 'POPUP_TO_INFORM'
+    EXPORTING
+      titel         = 'Конец фильма'
+      txt1          = ' Отец не понимате и глубоко скорбит над телом'
+      txt2          = 'умершего Стефана'.
+   counter = counter + 5. " 80MINS
+   num_end = num_end + 1.
+ PERFORM konec.
+  ENDFORM.
+
+FORM q4_1_a2. " did NOT go w/mom 10MINS
+   CALL FUNCTION 'POPUP_TO_INFORM'
+    EXPORTING
+      titel         = 'Маленький Стефан не поехал с мамой'
+      txt1          = 'Стефан остался искать свою игрушку и отказался ехать с мамой.'
+      txt2          = 'В резултате, Мать пропускает поезд в 8:30 и садится 8:45 утра'
+     TXT3           = 'Тот роковой поезд унес ее жизнь. Стефан винит отца во всем'
+     TXT4           = 'Психолог успокаивает и говрить позвонить ей ведь у него есть ее номер.'
+
+            .
+     counter = counter + 10.
+     PERFORM q4_12_a.
+ENDFORM.
+
+
+FORM q4_12_a. " bookstore
+counter = counter + 10.
+    CALL FUNCTION 'POPUP_TO_INFORM'
+    EXPORTING
+      titel         = 'Стефан собрался в магазин WHSmith '
+      txt1          = 'Стефан в магазине собираеться купить что-то послушать.'
+      txt2          = 'Стоит выбор между двумя альбомами'
+     TXT3           = 'Phaedera или The Bermuda Triangle?'
+           .
+ENDFORM.
+
+
+FORM q4_a2. " не говорит о матери, she asks again
+ CALL FUNCTION 'POPUP_TO_INFORM'
+    EXPORTING
+      titel         = 'Разговор о матери: встречный вопрос '
+      txt1          = 'При вопросе Стефан задает встречный вопрос психологу'
+      txt2          = '"Что хорошего может принести разговор о моей матери"'
+     TXT3           = 'Доктор Хэйнс (психолог) пытается достучаться до него '
+     TXT4           = 'и переспрашивает не хочет ли он поговорить о матери? '
+            .
+     PERFORM q4_2.
+ ENDFORM.
+
+
+ FORM q4_2. " talk about mom?
+clear lv_answer.
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Разговор о матери'
+      text_question         = 'Стоит ли Стефану говорить о матери?'
+      text_button_1         = 'Да'(001)
+      text_button_2         = 'Нет'(002)
+      default_button        = '1'
+      display_cancel_button = 'X'
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q4_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q4_2_a2.
+  ELSEIF lv_answer = 'A'.
+    WRITE: /'Abort mission it is'.
+  ENDIF.
+ ENDFORM.
+
+
+FORM q4_2_a2. " NO, do NOT talk about mom
+  MESSAGE 'Стефан никак не хочет говорить о матери (немного раздражен)' TYPE 'I'.
+  PERFORM q4_12_a.
+ENDFORM.
+
+
+FORM q5. " which album?
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Альбом'
+      text_question         = 'Какой альбом следует выбрать Стефану?'
+      text_button_1         = 'Phaedera'(001)
+*     icon_button_1         = 'green'
+      text_button_2         = 'The Bermuda'(002)
+*     icon_button_2         = 'red'
+      default_button        = '1'
+      display_cancel_button = 'X'
+*     USERDEFINED_F1_HELP   = ' '
+     START_COLUMN          = 25
+     START_ROW             = 6
+*     POPUP_TYPE            =
+    IMPORTING
+      answer                = lv_answer
+* TABLES
+*     PARAMETER             =
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q5_a12.
+  ELSEIF lv_answer = '2'.
+    PERFORM q5_a12.
+  ELSEIF lv_answer = 'A'.
+    WRITE: /'Abort mission it is'.
+  ENDIF.
+ ENDFORM.
+
+ FORM q5_a12.
+
+   CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Начинает программировать'
+    txt1          = 'Стефан помимо альбома также покупает книгу "Жизни Жерома Дэвиса".'
+    txt2          = 'Он просматривает купленную книгу (The lives of Jerome F Davies) в автобусе.'
+    txt3          = 'Сетфан наконец садится за комп и начинает программировать игру.'
+    txt4          = ' Июль 17, 1984 года. Стефан начинает принимать таблетки'
+          .
+
+      CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Начинает программировать'
+    txt1          = 'Ошибка в коде. Время идет. Август 3, 1984 года. Август 20, 1984 года'
+    txt2          = 'Отец заходит в комнату с чашкой чая для Стефана и зовет его пообедать'
+    txt3          = 'Стефан отказывается. Сбой в игре. Стефан очень раздражен'
+    txt4          = 'Он начинает беситься из за этого сбоя'
+          .
+ ENDFORM.
+
+
+ FORM q6.  " throw a rea or yell at dad?
+   CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Пролить чай или наорать'
+      text_question         = 'Что сделать Стефану: Пролить чай на клавитуру или норать на отца?'
+      text_button_1         = 'Пролить чай'(001)
+*     icon_button_1         = 'green'
+      text_button_2         = 'Наорать'(002)
+*     icon_button_2         = 'red'
+      default_button        = '1'
+      display_cancel_button = 'X'
+*     USERDEFINED_F1_HELP   = ' '
+     START_COLUMN          = 25
+     START_ROW             = 6
+*     POPUP_TYPE            =
+    IMPORTING
+      answer                = lv_answer
+* TABLES
+*     PARAMETER             =
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q5_a12.
+  ELSEIF lv_answer = '2'.
+    PERFORM q6_a2.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+
+ ENDFORM.
+
+ FORM q6_a2. " yell at dad
+
+       CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Орет на отца'
+    txt1          = 'Стефан: "Пошел на ***"'
+    txt2          = 'Отец: "Бери куртку. Мы идем кушать"'
+    txt3          = 'Отец везет Стефана у психологу'
+    txt4          = 'Перед тем зайти к психологу, он видит Колина. Предстоит выбор'
+          .
+ ENDFORM.
+
+
+ FORM q7. " Зайти к психологу или за Колином (LSD)
+   CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Психолог или Колин'
+      text_question         = 'Зайти к психологу или же последовать за Колином'
+      text_button_1         = 'К психологу'(001)
+      text_button_2         = 'За Колином'(002)
+      default_button        = '1'
+      display_cancel_button = 'X'
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  ASSIGN lv_answer to <fs_field_lsd_eq_2>. " response for Stephen following Colin then eventually taking LSD
+
+  IF lv_answer = '1'.
+    PERFORM q7_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q7_a2.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+ENDFORM.
+
+FORM q7_a2. "следует за колином (not a default choice)
+ CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Следует за Колином'
+    txt1          = 'Колин справшивает о том как идет разработке игры. Стефан отвечает ему что он'
+    txt2          = 'в полной растерянности. Колин говорит что Стефан в дыре, что он борется '
+    txt3          = 'со своими же мыслями. Стефан полностью соглашается. Колин зовет его к себе.'
+    txt4          = 'Знакомит с Китти(девушка/жена) и с дочкой. Позже предлагает ему LSD (наркотики).'
+          .
+PERFORM q7_a2_2.
+ENDFORM.
+
+FORM q7_a2_2. " take LSD? (almost meaningless)
+CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Принять LSD?'
+      text_question         = 'Принять LSD?'
+      text_button_1         = 'Да'(001)
+      text_button_2         = 'Нет'(002)
+      default_button        = '1'
+      display_cancel_button = 'X'
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q7_a2_2_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q7_a2_2_a2.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+ENDFORM.
+
+FORM q7_a2_2_a2.
+ CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Отказывается от LSD'
+    txt1          = 'Колин сам принимает LSD и ложит одну таблетку в чай'
+    txt2          = 'Стефан ничего не подозревая пьет чай. '
+    txt3          = ''
+          .
+    PERFORM q7_a2_2_a1. " LSD scene
+ENDFORM.
+
+FORM q7_a2_2_a1. " LSD text
+  CALL FUNCTION 'POPUP_DISPLAY_TEXT'
+    EXPORTING
+      language     = sy-langu
+      popup_title  = 'LSD'
+      start_column = 10
+      start_row    = 3
+      text_object  = 'BANDERSNATCH_LSD'.
+  .
+  IF sy-subrc <> 0.
+    MESSAGE 'Wrong path, MATE' TYPE 'E'.
+  ENDIF.
+
+   CALL FUNCTION 'POPUP_TO_INFORM'
+    EXPORTING
+      titel         = 'Линия судьбы'
+      txt1          = 'У нас одна линия судьбы.У нас с тобой, сейчас.'
+      txt2          = 'Как эта линия заканчивается не имеет значения.'
+     TXT3          = 'Важно лишь то, как наши решения в этой линии влияют на все остальное'
+     TXT4          = 'Ты мне веришь? Нет? Я докажу тебе. Один из нас сейчас спрыгнет.'
+            .
+
+   CALL FUNCTION 'POPUP_TO_INFORM'
+    EXPORTING
+      titel         = 'Прыжок'
+      txt1          = 'Один из нас умрет. Но это не имеет значении. '
+      txt2          = 'Есть другие линии судьбы, Стефан. Сколько раз у тебя умирал Пакман?'
+     TXT3          = 'И ему всё нипочём.Он просто начинает заново.'
+     TXT4          = 'Один из нас сейчас прыгнет. Ты или я? Решай.'
+            .
+counter = counter + 10 . "55MINS
+PERFORM q7_a2_2_a1_2.
+ENDFORM.
+
+FORM q7_a2_2_a1_2. " who jumps?
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Кто прыгнет'
+      text_question         = 'Кому прыгнуть?'
+      text_button_1         = 'Стефан'(001)
+      text_button_2         = 'Колин'(002)
+      default_button        = '1'
+      display_cancel_button = 'X'
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q7_a2_2_a1_2_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q7_a2_2_a1_2_a2.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+ENDFORM.
+
+FORM q7_a2_2_a1_2_a1. " Stephen jumps and dies
+       CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Стефан прыгает'
+    txt1          = 'Стефан прыгает и умирает.'
+    txt2          = '4 месяца спустя. '
+    txt3          = 'Играет музыка тихой ночи Рождества. Игра находится в шкафу.'
+    txt4          = 'Это вышло плохой'
+          .
+    num_end = num_end + 1.
+    PERFORM konec.
+ENDFORM.
+
+FORM q7_a2_2_a1_2_a2. " Colin jumps
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Колин прыгает'
+    txt1          = 'Стефан говорит Колину, чтобы он прыгнул. Колин соглашается и говорит:'
+    txt2          = '"Еще увидимся" и прыгает. Колин умирает.'
+    txt3          = 'Китти увидев Стефана спрашивает где Колин. Появляется ПАКС (монстр) и'
+    txt4          = 'Стефан от ужаса просыпается. Они с отцом в машине собираются зайти к психологу.'
+          .
+PERFORM q7_a1.
+ENDFORM.
+
+
+FORM q7_a1. " Заходит к психологу (а не за Колином)
+
+  CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Зашел к психологу'
+    txt1          = 'Стефан плохо себя чувствует'
+    txt2          = 'Ощущение что он не контролирует себя'
+    txt3          = 'Он начинает...'
+          .
+       PERFORM q7_a1_subquestion.
+
+
+ENDFORM.
+
+FORM q7_a1_subquestion. " meaningless (ногти или ухо)
+   CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'ногти или мочки уха '
+      text_question         = 'Начинать кусть ногти или тянуть мочку уха'
+      text_button_1         = 'Кусать ногти'(001)
+      text_button_2         = 'За мочку уха'(002)
+      default_button        = '1'
+      display_cancel_button = 'X'
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q7_a1_subquestion_a12.
+  ELSEIF lv_answer = '2'.
+    PERFORM q7_a1_subquestion_a12.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+ENDFORM.
+
+FORM q7_a1_subquestion_a12.
+  IF <fs_field_lsd_eq_2> IS NOT ASSIGNED or <fs_field_lsd_eq_2> eq 1.
+ CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'У психолога'
+    txt1          = 'Стефан всячески пытается не делать этого'
+    txt2          = 'Доктор Хэйнс увеличивает дозу таблеток'
+    txt3          = 'Стефан и отец возвращаются домой'
+    txt4          = 'Дома в ванной перед примением таблеток, Стефан задумался...'
+          .
+  ELSEIF <fs_field_lsd_eq_2> IS ASSIGNED AND <fs_field_lsd_eq_2> eq 2.
+     CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'У психолога'
+    txt1          = 'Стефан всячески пытается не делать этого. Потом говорит доктору'
+    txt2          = 'что они разговаривали на эту тему. И говрит путь чертов она припишет таблетки'
+    txt3          = 'Стефан и отец возвращаются домой'
+    txt4          = 'Дома в ванной перед примением таблеток, Стефан задумался...'
+          .
+
+  ENDIF.
+ PERFORM q7_a1_subquestion_2.
+ENDFORM.
+
+FORM q7_a1_subquestion_2. " пить таблетки или выкинуть
+   CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Выпить таблетки или выкинуть их'
+      text_question         = 'Стоил ли ему выпить таблетки или выкинуть их?'
+      text_button_1         = 'Выпить'(001)
+      text_button_2         = 'Выкинуть'(002)
+      default_button        = '1'
+      display_cancel_button = 'X'
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q7_a1_subquestion_2_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q7_a1_subquestion_2_a2.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+ENDFORM.
+
+
+FORM q7_a1_subquestion_2_a1. " выпивает таблетки 10MINS
+ CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Стефан пьет таблетки'
+    txt1          = 'Играет "Тихая ночь" (Silient Night). Брандашмыг (Bandersnatch) на дисплее'
+    txt2          = 'Все идет к тому что применение таблеток все же испортила концовку игры'
+    txt3          = 'Игра получает рэйтинг 2.5 из 5'
+    txt4          = 'Стефан попытается все заново сделать'
+          .
+    counter = counter + 10. "30 mins should be passed after this
+    PERFORM q7_a1_subquestion_2.
+
+ENDFORM.
+
+FORM  q7_a1_subquestion_2_a2. " выкидывает таблетки
+
+IF  <fs_field_lsd_eq_2> EQ 1. " did NOT take LSD
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Стефан выкидывает таблетки'
+    txt1          = 'Прошло 5 месяцев. Стефан беспрерывно работает над игрой. Сентябрь 12, 1984 года.'
+    txt2          = 'Игра вылетает во время демо. Колин указывает про еще один путь, которая есть в'
+    txt3          = 'книгие, но нет в игре. Дедлайн продливается до Понедельника. Колин дает Стефану'
+    txt4          = 'видеокассету чтобы вдохновить его. Стефан начинает смотреть фильм'
+          .
+
+    ELSEIF <fs_field_lsd_eq_2> EQ 2. " LSD
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Стефан выкидывает таблетки'
+    txt1          = 'Прошло 5 месяцев. Стефан беспрерывно работает над игрой. Сентябрь 12, 1984 года.'
+    txt2          = 'Игра вылетает во время демо. '
+    txt3          = 'Колин находит новый путь которая есть в книге, но нет в игре. '
+    txt4          = 'Дедлайн продливается до Понедельника'
+    .
+
+    CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Стефан выкидывает таблетки'
+    txt1          = 'Колин оставляет Стефану видеокассету чтобы вдохновить его.'
+    txt2          = 'Колина все ищут. Он пропал.'
+    txt3          = 'Интерн отдает кассету Стефану. '
+    txt4          = 'Стефан начинает смотреть фильм.'
+          .
+    ENDIF.
+PERFORM q7_a1_subquestion_2_a1_subq.
+ENDFORM.
+
+FORM q7_a1_subquestion_2_a1_subq. " стол или комп
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Разрушить комьютер или ударить стол'
+      text_question         = 'Что разрушить Стефану?'
+      text_button_1         = 'клавиатуру '(001)
+      text_button_2         = 'стол'(002)
+      default_button        = '1'
+      display_cancel_button = 'X'
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q7_a1_subquestion_2_a1_subq_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q7_a1_subquestion_2_a1_subq_a2.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+ENDFORM.
+
+FORM q7_a1_subquestion_2_a1_subq_a1. " ломает комп
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Стефан домает компюьтер'
+    txt1          = 'Стефан сломал компьютер и начинает плакать'
+    txt2          = 'Отец заходит и начинает успокаивать его'
+    txt3          = 'Колин начинает заново'
+          .
+PERFORM q7_a1_subquestion_2_a1_subq.
+
+ENDFORM.
+
+FORM q7_a1_subquestion_2_a1_subq_a2. " бьет стол и засыпает и просыпается
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Стефан бьет стола'
+    txt1          = 'На экране фильма, который смотрит Стефан выходит следующее сообщение'
+    txt2          = '"Твоя судьба была продиктована, а ты просто марионетка в ней"'
+    txt3          = '"Your fate has been dictated, you are just a puppet"'
+    txt4          = 'Стефан уходит и видит семейное фото с книгой'
+          .
+PERFORM q8.
+ENDFORM.
+
+
+FORM q8. " family photo or a book?
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Семейное фото или Книга'
+      text_question         = 'Что следует взять Стефану?'
+      text_button_2         = 'Семейное фото'(001)
+      text_button_1         = 'Книга'(002)
+      default_button        = '1'
+      display_cancel_button = ''
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q8_a12. "
+  ELSEIF lv_answer = '2'.
+    IF <fs_field_lsd_eq_2> eq 1.
+      PERFORM q8_a2.
+    ELSEIF <fs_field_lsd_eq_2> eq 2.
+      PERFORM q8_a2_lsd.
+    ENDIF.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+  ENDFORM.
+
+FORM q8_a2_lsd. " LSD picks up a family photo
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Через зеркала'
+    txt1          = 'Вспоминает слова Колина:Зеркала позволяют путешествовать во времени.'
+    txt2          = 'Стефан просыпается и идет к ванной комнате. Прикасается к зеркалу и заходит'
+    txt3          = 'Обратно выходит с зеркала, но уже маленьким мальчиком'
+    txt4          = 'И слышит как родители ругаются'
+          .
+
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Ссора родителей'
+    txt1          = 'Он видит как его Отец упрекает Мать в том что Стефан не должен '
+    txt2          = 'спать с такой игрушкой, как розовый кролик.И забирает кролика'
+    txt3          = 'Стефан просыпается. Потом садится за стол работать над игрой.'
+    txt4          = 'Игра вылетает (сбой). Он нервничает. На столе стояла чашка чая'
+          .
+          counter = counter + 10. " 40mins
+PERFORM q10.
+
+"CHANGE think this all should be replaced by "Coling waking up. JFD Killing him. Colin waking up again"
+
+
+ ENDFORM.
+
+ FORM q8_a2. " picks up a family photo
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Через зеркала'
+*    txt1          = 'Вспоминает слова Колина:Зеркала позволяют путешествовать во времени.'
+    txt2          = 'Стефан просыпается и идет к ванной комнате. Прикасается к зеркалу и заходит'
+    txt3          = 'Обратно выходит с зеркала, но уже маленьким мальчиком'
+    txt4          = 'И слышит как родители ругаются'
+          .
+
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Ссора родителей'
+    txt1          = 'Он видит как его Отец упрекает Мать в том что Стефан не должен '
+    txt2          = 'спать с такой игрушкой, как розовый кролик.И забирает кролика'
+    txt3          = 'Стефан просыпается. Потом садится за стол работать над игрой.'
+    txt4          = 'Игра вылетает (сбой). Он нервничает. На столе стояла чашка чая'
+          .
+PERFORM q10.
+ ENDFORM.
+
+
+FORM q8_a12.
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Стефан берет книгу'
+    txt1          = 'Стефан засыпает. Потом просыпается. '
+    txt2          = 'Заходит в комнату отца и крадет ключи'
+    txt3          = 'Нужно ввести пароль чтобы открыть чемодан'
+    txt4          = ' Пароль состоит из 3 букв'
+          .
+    PERFORM q9.
+ENDFORM.
+
+FORM q9. " JFD or PAX (if LSD: TOY or PAC)
+
+IF <fs_field_lsd_eq_2> eq 1. " IF LSD or not
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'JFD vs PAX'
+      text_question         = 'Какой пароль подобрать Стефану?'
+      text_button_1         = 'JFD'(001)
+      text_button_2         = 'PAX'(002)
+      default_button        = '1'
+      display_cancel_button = ''
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q9_a1. " JFD
+  ELSEIF lv_answer = '2'.
+    PERFORM q9_a2. " PAX
+  ELSEIF lv_answer = 'A'.
+    WRITE: /'Abort mission it is'.
+  ENDIF.
+
+  ELSEIF <fs_field_lsd_eq_2> eq 2. " LSD
+
+    CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'TOY vs PAC'
+      text_question         = 'Какой пароль подобрать Стефану?'
+      text_button_1         = 'TOY'(001)
+      text_button_2         = 'PAC'(002)
+      default_button        = '1'
+      display_cancel_button = ''
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q9_a1_lsd. " toy
+  ELSEIF lv_answer = '2'.
+    PERFORM q9_a2_lsd. " pac
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+
+  ENDIF.
+ENDFORM.
+
+FORM q9_a1_lsd. " TOY (LSD)
+
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'TOY (игрушка)'
+    txt1          = ' "Правильный пароль" '
+    txt2          = 'Стефан открывает чемодан, а там кролик-игрушка. Отец заходит в комнату.'
+    txt3          = 'Он молодой,а Стефан ребенок. Отец разрешает маленькому Стефану оставить'
+    txt4          = 'кролика с собой. Стефан видит как маленький Стефан ложит ее обратно под кроватью'
+          .
+
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Стефан у психолога'
+    txt1          = ' Следущая сцена. Стефан у психологоа '
+    txt2          = ' Он разговаривают про Мать и игрушку.'
+    txt3          = 'так как маленький Стефан нхаодит игрушку легко'
+*    txt4          = 'кроватью'
+          .
+
+    MESSAGE 'В этот раз Стефан решает пойти с мамой' TYPE 'I'.
+    PERFORM q4_1_a1.
+ENDFORM.
+
+
+FORM q9_a2_lsd. " PAC
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'PAC (ПАК)'
+    txt1          = ' "Правильный пароль" '
+    txt2          = 'ПАК. Программа Абсолютного Контроля. (с игры PAC-MAN)'
+    txt3          = 'Стефан находит множество документов с его именем в папке P.A.C.S'
+    txt4          = '(Program And Control Study - Исследование Программы Абслоютного Контроля)'
+          .
+
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'PAC (ПАК)'
+    txt1          = 'Стефан находит таблетки, наркотики, и видеозапись его жизни. Он включает'
+    txt2          = 'и видит что смерть его матери было фальсифицировано. Оно делалось для'
+    txt3          = 'того чтобы сделать психологическую травму. На видео видно Отец дает'
+    txt4          = 'сладости маленьькому Стефану, который содержит наркотические вещеста.'
+          .
+
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'PAC (ПАК)'
+    txt1          = 'Стефану забивали голову что ее мать погибла. И в результате у него'
+    txt2          = 'сформировались не правильные воспоминания о прошлом. Стефан разненавидел отца'
+    txt3          = 'В этот момент отец заходит. Стефан кричит на него и следом убивает его '
+    txt4          = 'в ужасе Стефан просыпается. Подходит к своему столу и'
+          .
+PERFORM q10.
+
+ENDFORM.
+FORM q9_a1. "JFD
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'JFD (Jerome F Davies - автор книги)'
+    txt1          = ' "Неверный пароль" '
+    txt2          = 'Жером Ф Дэвис появляется сзади и начинает смеяться'
+    txt3          = 'Стефан просыпается. Продолжает работать над кодом. Игра обратно вылетает'
+    txt4          = 'Во время работы над игрой он сильно занервничал. На столе стояла чашка чая. '
+          .
+          PERFORM q10.
+
+ENDFORM.
+
+FORM q9_a2. " PAX
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'PAX(страшное существо из книги)'
+    txt1          = ' "Неверный пароль" '
+    txt2          = 'PAX появляется и убивает Стефана'
+    txt3          = 'Стефан просыпается. Продолжает работать над кодом. Игра обратно вылетает'
+    txt4          = 'Во время работы над игрой он сильно занервничал. На столе стояла чащка чая.'
+          .
+          PERFORM q10.
+ENDFORM.
+
+FORM q10. " Чай на клава или монитор
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Пролить чай на клавиатуру или разрушить компьютер'
+      text_question         = 'Что следует сделать Стефану?'
+      text_button_1         = 'Пролить чай'(001)
+      text_button_2         = 'Сломать комп'(002)
+      default_button        = '1'
+      display_cancel_button = 'X'
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q10_a12.
+  ELSEIF lv_answer = '2'.
+    PERFORM q10_a12.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+ENDFORM.
+
+
+FORM q10_a12. " Стефан отказывается слушаться
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Отказ'
+    txt1          = ' Стефан отказывается слушаться'
+    txt2          = 'и спрашивает:'
+    txt3          = '"КТО ТУТ? КТО ПЫТАЕТСЯ КОНТРОЛЛРОВАТЬ НАД О МНОЙ?"'
+    txt4          = '*Нужно на экране монитора ответить'
+              .
+  PERFORM q11.
+
+ENDFORM.
+
+
+FORM q11. " netflix or glyph symbol? ( Or  P.A.C.S. on LSD)
+  IF <fs_field_lsd_eq_2> eq 1. " no LSD no P.A.C.S.
+
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Netflix или Глиф символ (перевернутый -|= ) '
+      text_question         = 'Как ответить Стефану?'
+      text_button_1         = 'Netflix(KAP)'(001)
+      text_button_2         = 'Глиф символ'(002)
+      default_button        = '1'
+      display_cancel_button = 'X'
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+ELSEIF <fs_field_lsd_eq_2> eq 2.
+
+*DATA: BEGIN OF spoplist OCcurs 15.
+*      INCLUDE STRUCTURE spopli.
+*DATA: END OF spoplist.
+
+*SPOPLIST-VAROPTION = 'Netflix'(001).
+*  APPEND SPOPLIST.
+*  SPOPLIST-VAROPTION = 'Глиф символ (-|=)'(002).
+* APPEND SPOPLIST.
+*  SPOPLIST-VAROPTION = 'P.A.C.S'(003).
+*  APPEND  spoplist.
+
+*** { Aidar 07.02.2019 16:51:40
+DATA: spoplist TYPE STANDARD TABLE OF spopli WITH EMPTY KEY.
+
+
+spoplist = VALUE #( ( VAROPTION = 'Netflix'(001) SELFLAG = 'X' )
+                    ( VAROPTION = 'Glyph Symbol'(002) SELFLAG = 'X' )
+                    ( VAROPTION = 'P.A.C.S.'(003) SELFLAG = 'X' )
+                    ).
+
+
+*** } Aidar
+
+*  SPOPLIST-SELFLAG   = 'X'.
+CALL FUNCTION 'POPUP_TO_DECIDE_LIST'
+  EXPORTING
+*   CURSORLINE               = 1
+*   MARK_FLAG                = ' '
+*   MARK_MAX                 = 1
+*   START_COL                = 0
+*   START_ROW                = 0
+    textline1                = 'Netflix, Глиф символ (-|= перевернутая) или P.A.C.S.'
+*   TEXTLINE2                = text-001"'Глиф сивол'
+*   TEXTLINE3                = text-001"'P.A.C.S.'
+    titel                    = 'Netflix, Глиф или P.A.C.S.'
+*   DISPLAY_ONLY             = ' '
+ IMPORTING
+   ANSWER                   = lv_answer
+  TABLES
+    t_spopli                 = spoplist
+ EXCEPTIONS
+   NOT_ENOUGH_ANSWERS       = 1
+   TOO_MUCH_ANSWERS         = 2
+   TOO_MUCH_MARKS           = 3
+   OTHERS                   = 4
+          .
+IF sy-subrc EQ 1.
+* Implement suitable error handling here
+  MESSAGE 'Not Enough Answers. Try again' TYPE 'I'.
+    PERFORM q11.
+  ELSEIF sy-subrc EQ 2.
+    MESSAGE 'Too Many Answers. Try again' TYPE 'I'.
+    PERFORM q11.
+  ELSEIF sy-subrc EQ 3.
+   MESSAGE 'Not Enough Marks. Try again' TYPE 'I'.
+    PERFORM q11.
+  ELSEIF sy-subrc eq 4.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+ENDIF.
+
+ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q11_1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q11_a2.
+  ELSEIF lv_answer = '3'.
+    PERFORM q11_a3_lsd.
+  ENDIF.
+ENDFORM.
+
+FORM q11_a3_lsd. " P.A.C.S.
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'P.A.C.S'
+    txt1          = 'Program And Control Studies(Исследование Программы Абсолютного Контроля)'
+    txt2          = 'На экране появляеется P.A.C.S. В этот момент заходит отец. Стефан:'
+    txt3          = '"Я знаю что ты конроллируешь мою жизнь, про P.A.C.S. Знаю про видеозаписи "'
+    txt4          = 'Про наркотические вещества, таблетки, про сообщения, файлы. Я знаю все.'
+              .
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'P.A.C.S'
+    txt1          = 'Отец: "Стефан, ты болен. О чем ты говоришь?"'
+    txt2          = 'Стефан: "Я знаю все что ты делал со мной"'
+    txt3          = '"всю мою жизнь." И, в ярости, убивает отца.'
+    txt4          = 'Стефан берет в руки телефон и собираеться звонить'
+              .
+    PERFORM q11_lsd.
+ENDFORM.
+
+FORM q11_lsd. "  20541 or any other number?
+ CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Какой номер набрать?'
+      text_question         = 'Какой номер набрать Стефану:?'
+      text_button_1         = 'Любой'(001)
+      text_button_2         = '20541'(002)
+      default_button        = '1'
+      display_cancel_button = ''
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q11_lsd_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q11_lsd_a2.
+  ELSEIF lv_answer = 'A'.
+    WRITE: /'Abort mission it is'.
+  ENDIF.
+ENDFORM.
+
+FORM q11_lsd_a1. " any number
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Любой другой номер'
+    txt1          = '"Номер который вы набрали не существует или находится вне зоны."'
+    txt2          = 'Стефан пытается вспомнить номер но в ответ телефон: "Номер не существует..."'
+    txt3          = 'После безуспешной попытки, Стефан закапывает отца.'
+    txt4          = 'Садится за стол и продолжает работать над игрой)'
+              .
+
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Конец'
+    txt1          = 'Стефан кодит и слышит собака пролезла в сад. (Та же собака)'
+    txt2          = 'Собака копает то же самое место в саду как и в начале, только в этот раз'
+    txt3          = 'там находится тело отца. Вскоре игра выходит в прокат не завершившись'
+    txt4          = 'Рэйтинг игры 2.5 из 5. Конец.'
+              .
+    num_end = num_end + 1.
+PERFORM konec.
+ENDFORM.
+
+
+FORM q11_lsd_a2. " 2541
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = '20541'
+    txt1          = 'Стефан мог вспомнить номер и звонит доктору Хэйнс. Отвечает секретарша'
+    txt2          = 'Стефан говорит что убил отца и угрожает сделать то же самое с психологом'
+*    txt3          = 'отца.'
+*    txt4          = 'и '
+              .
+
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Конец'
+    txt1          = 'Игра Bandersnatch (Брандашмыг) выходит в прокат.'
+    txt2          = 'Получает рэйтинг 2.5 из 5.'
+    txt3          = 'Стефан в тюрьме.'
+    txt4          = ' Конец.'
+              .
+    counter = counter + 10. " 90MINS
+    num_end = num_end + 1.
+PERFORM konec.
+ENDFORM.
+
+
+FORM q11_1. " Netflix
+
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Netflix(KAP)?'
+      text_question         = 'Стефан спрашивает: Что такое Netflix (KAP08)?'
+      text_button_1         = 'Объяснить'(001)
+      text_button_2         = 'Подробнее'(002)
+      default_button        = '1'
+      display_cancel_button = ''
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q11_1_a12.
+  ELSEIF lv_answer = '2'.
+    PERFORM q11_1_a12.
+  ELSEIF lv_answer = 'A'.
+    WRITE: /'Abort mission it is'.
+  ENDIF.
+ENDFORM.
+
+FORM q11_1_a12. " Netflix explanation
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Netflix (KAP Technology, КАП 08)'
+    txt1          = 'Развлекательная платформа на основе потокового мультимедия из начала 21 века'
+    txt2          = '(KAP Technology-корпоративный Оператор связи и ОЦО для АО «НАК «Казатомпром» '
+    txt3          = '( Проект КАП08 - проект внедрения SAP SE ) '
+    txt4          = 'Стефан ничего не понимает'
+              .
+
+
+  PERFORM q11_2.
+ENDFORM.
+
+FORM q11_2. " Netflix explanation
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Netflix(KAP)'
+      text_question         = 'Стефан еще раз переспрашивает?'
+      text_button_1         = 'Объяснить'(001)
+      text_button_2         = 'Рассказать'(002)
+      default_button        = '1'
+      display_cancel_button = ''
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q11_2_a12.
+  ELSEIF lv_answer = '2'.
+    PERFORM q11_2_a12.
+  ELSEIF lv_answer = 'A'.
+    WRITE: /'Abort mission it is'.
+  ENDIF.
+ENDFORM.
+
+FORM q11_2_a12. "Netflix explanation
+
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Netflix (KAP Technology)'
+    txt1          = 'Netflix - это как телевизор, только онлайн. Я его контроллирую.'
+    txt2          = '(В проекте КАП08 в программе ZBANDERSNATCH в SAP - Я контроллирую твои действия)'
+    txt3          = 'Отец заходит в комнату. Стефан говорит что его кто-то контроллирует из будущего.'
+    txt4          = 'Отец спрашивает позвонить ли ему Докору Хэйнс. Стефан говорит "Да, пожалуйста"'
+              .
+
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Разговор с психолгом'
+    txt1          = 'Стефан все объясняет психологу. Говорит про некую развлекательную штуку.'
+    txt2          = 'Она в недоумении. И задает интересный встречный вопрос:'
+    txt3          = '"Если это развлекательная штука, то делается чтобы кого-то развлекать.'
+    txt4          = 'Тогда почему ты не в более развлектальном сюжете?'
+              .
+
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Разговор с психолгом'
+    txt1          = 'И продолжает: "Ты(Стефан) сидишь в самой обычной комнате, в обычной части света'
+    txt2          = ' и разговариваешь с обычной женщиной." '
+    txt3          = 'И добавляет: "Тебе бы самому не хотелось побольше динамики'
+    txt4          = 'если бы ты смотрел на себя по телику?" '
+              .
+
+
+
+    PERFORM q11_3.
+ENDFORM.
+
+FORM q11_3. " More Action?
+ CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'More Аction?'
+      text_question         = 'Добавить больше динамики?'
+      text_button_1         = 'Да'(001)
+      text_button_2         = 'О, ДААА!!!'(002)
+      default_button        = '1'
+      display_cancel_button = ''
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q11_3_a12.
+  ELSEIF lv_answer = '2'.
+    PERFORM q11_3_a12.
+  ELSEIF lv_answer = 'A'.
+    WRITE: /'Abort mission it is'.
+  ENDIF.
+ENDFORM.
+
+FORM q11_3_a12. " more action
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Больше динамики'
+    txt1          = 'Стефан кидает чашку чая прямо ей в лицо, Доктор Хэйнс начинает кричать'
+    txt2          = 'Доктор Хэйнс хвататет в руки нунчаки и приказывает нападать на нее'
+    txt3          = 'Предстоит выбор...'          .
+PERFORM q11_4.
+ ENDFORM.
+
+ FORM q11_4. " window or figth her?
+ CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'В окно или драться'
+      text_question         = 'Что сделать: выброситься в окно или сразиться с ней?'
+      text_button_1         = 'В окно'(001)
+      text_button_2         = 'Драться'(002)
+      default_button        = '1'
+      display_cancel_button = ''
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q11_4_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q11_4_a2.
+  ELSEIF lv_answer = 'A'.
+    WRITE: /'Abort mission it is'.
+  ENDIF.
+ENDFORM.
+FORM q11_4_a1. " jump to the window
+ CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Конец'
+    txt1          = 'СТОП! СНЯТО! Майк, ты в порядке? Что ты делаешь? Хотел прыгнуть в окно? '
+    txt2          = 'Ты не должен прыгать. В сценарии нет прыжка. Вызовите кто-нибудь доктора.'
+    txt3          = 'Его "Отец" оказывается один из режисеров.'
+    txt4          = 'Конец фильма'          .
+
+counter = counter + 5. " 45MINS
+PERFORM konec.
+WRITE: / 'Это конец одной жизни. Хотите попробовать другию реальность?'.
+ENDFORM.
+
+FORM q11_4_a2. " fight her
+ CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Драка'
+    txt1          = 'Она бьет его, он уклоняется от ее ударов и выбрасывает ее через стол.   '
+    txt2          = 'В этот момент отец заходит, останавливает и прислоняет Стефана к стене.'
+    txt3          = 'Сетфана прижат к стене, сопротивляется'
+    txt4          = 'И хочет...'          .
+    PERFORM q11_5.
+ENDFORM.
+
+FORM q11_5. " karate or hit the eggs
+ CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Каратэ или Яйца'
+      text_question         = 'Прием Караитэ или удар между ног Отцу??'
+      text_button_1         = 'Каратэ-Чоп'(001)
+      text_button_2         = 'Между ног'(002)
+      default_button        = '1'
+      display_cancel_button = ''
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q11_5_a12.
+  ELSEIF lv_answer = '2'.
+    PERFORM q11_5_a12.
+  ELSEIF lv_answer = 'A'.
+    WRITE: /'Abort mission it is'.
+  ENDIF.
+ENDFORM.
+
+FORM q11_5_a12. " Конец №
+ CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Конец'
+    txt1          = 'Отец отпускает его. Стефан(в ярости) кричит: Как тебе такое развлечение?'
+    txt2          = 'Я и мой дружок из будущего испортили тебе весь день? Психиапатрическое *****. '
+    txt3          = 'Отец начинает успокаивает его.'
+    txt4          = 'Конец фильма'          .
+    num_end = num_end + 1.
+PERFORM konec.
+WRITE: / 'Это конец одной жизни. Хотите попробовать другию реальность?'.
+ ENDFORM.
+
+
+FORM q11_a2. " glyph symbol
+ CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Отец заходит'
+    txt1          = 'Отец заходит в комнату. Стефан говрит:'
+    txt2          = '"Я не контроллирую себя"'
+    txt3          = 'Стефан не контроллируеь свои действия'
+    txt4          = 'Он не знает что делать...'.
+PERFORM q12.
+ENDFORM.
+
+FORM q12. " убивать отца?
+ CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Убивать или не убивать '
+      text_question         = 'Что сделать: Бить отца или не бить?'
+      text_button_1         = 'Бить'(001)
+      text_button_2         = 'Не бить'(002)
+      default_button        = '1'
+      display_cancel_button = 'X'
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q12_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q12_a2.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+ENDFORM.
+
+
+FORM q12_a2. " не убивает отца (meaningless)
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Ну убивает отца'
+    txt1          = 'Стефан: "Держись от меня подальше!"'
+    txt2          = '"Я не контроллирую себя."'
+    txt3          = 'Стефан плачет и отец усокаивает его'
+*    txt4          = ''
+      .
+ PERFORM q12.
+ENDFORM.
+
+FORM q12_a1. " убивает отца
+ CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Убивает отца'
+    txt1          = 'Стефан бьет отца пепельницой по голове и кричит:'
+    txt2          = '"Я не контроллирую себя."'
+    txt3          = 'Отец умирает. Стефан:'
+    txt4          = '"Что я натворил. Что мне делать теперь?"'  .
+
+PERFORM q13.
+ENDFORM.
+
+FORM q13. " закопать или расчленить отца
+ CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Закопать или расчленить'
+      text_question         = 'Что сделать: Закопать тело умершего отца или расчленить его?'
+      text_button_1         = 'Закопать'(001)
+      text_button_2         = 'Расчленить'(002)
+      default_button        = '1'
+      display_cancel_button = 'X'
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q13_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q13_a2.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+ENDFORM.
+
+FORM q13_a1. " закапывает
+ CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Закапывает отца'
+    txt1          = 'Стефан:"Окей. Окей." Телефон зазвенел'
+    txt2          = 'Это CEO комании Tuckersoft (руководитель Махан Такур) и спрашивает '
+    txt3          = '"Как дела с кодом? Мне нужен готовый код."'
+    txt4          = 'И добавляет:"К концу дня будет готово?"'
+     .
+
+
+   PERFORM q14.
+
+ENDFORM.
+
+FORM q14. "Код будет готов к концу дня?
+ CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Будет готово?'
+      text_question         = 'Будет ли код готов к концу дня?'
+      text_button_1         = 'Да'(001)
+      text_button_2         = 'Нет'(002)
+      default_button        = '1'
+      display_cancel_button = ''
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q14_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q14_a2.
+  ELSEIF lv_answer = 'A'.
+    WRITE: /'Abort mission it is'.
+  ENDIF.
+ENDFORM.
+
+FORM q14_a1. " Да, будет готов
+  IF <fs_field_lsd_eq_2> IS ASSIGNED or <fs_field_lsd_eq_2> eq 1.
+ CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Да, будет готов'
+    txt1          = 'Колин обращяясь к Такуру: "Тебе не следовало торопить его."'
+    txt2          = 'Такур: "Да, он врет. Сходи-ка к нему и посмотри чем он там занимается."'
+    txt3          = 'Тем временем Стефан закапывает тело отца. Звонок в дверь. Он берет с собой нож.'
+    txt4          = 'И про себя: "Брандашмыг(Bandersnatch), все это время ты был со мной. Помоги мне"'  .
+
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Конец'
+    txt1          = 'У двери стоял Колин. Колин замечает нож в руках.'
+    txt3          = 'Колин: "Хорошо,Теперь ты и меня убьешь или отпустишь?"'
+    txt2          = 'Стефан признается ему что он убил своего отца.'
+    txt4          = ''  .
+PERFORM q15.
+
+  ELSEIF <fs_field_lsd_eq_2> IS NOT ASSIGNED AND <fs_field_lsd_eq_2> eq 2.
+    CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Да, будет готов'
+    txt1          = 'Колин ищет Китти. Такур не беспокоится по этому поводу, ведь он не раз так делал'
+    txt2          = 'Китти далее расспрашивает у него адрес домв Стефана'
+    txt3          = 'Тем временем Стефан закапывает тело отца. Звонок в дверь.'
+*    txt4          = 'И говорит про себя: "Брандашмыг(Bandersnatch),
+*все это время ты был со мной. Помоги мне"'  .
+.
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Китти'
+    txt1          = 'У двери стояла Китти. Стефан спрашивает: "Мы встречались ранее"'
+    txt3          = 'Кити говорит что нет, не встречались и спрашивает про Колина.'
+*    txt2          = 'Стефан признается ему что он убил своего отца.'
+*    txt4          = ''
+    .
+
+    PERFORM q14_a1_1. " what should Stpehen answer
+
+ENDIF.
+counter = counter + 10 . " 65MINS
+ENDFORM.
+
+FORM q14_a1_1.
+ CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Что сказать Китти?'
+      text_question         = 'Что следует сказать Китти: нет или объяснить сон с LSD'
+      text_button_1         = 'Не знаю'(001)
+      text_button_2         = 'Объяснить'(002)
+      default_button        = '1'
+      display_cancel_button = 'X'
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    PERFORM q14_a1_1_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q14_a1_1_a2.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+  ENDFORM.
+
+  FORM q14_a1_1_a1. " tells Kitty No idea
+    CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Закопал'
+    txt1          = 'Китти просит дать ей знать если появится хоть какие-то новости о нем'
+    txt2          = 'Стефан докапывает, садится кодить. Собака пролезла в сад. (Та же собака)'
+    txt3          = 'Собака копает то же самое место в саду как и в начале, только в этот раз'
+    txt4          = 'там находится тело отца. '
+              .
+   PERFORM q15_a1_2.
+
+    ENDFORM.
+
+  FORM q14_a1_1_a2. "tells Kitty about LSD
+      CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Рассказывает'
+    txt2          = 'Китти  и уходит. Стефан кодит и слышит собака пролезла в сад. (Та же собака)'
+    txt3          = 'Собака копает то же самое место в саду как и в начале, только в этот раз'
+    txt4          = 'там находится тело отца. '
+    txt1          = 'Стефан рассказывает про его сон с ЛСД, что Колин мертв. Но он не уверен.'
+              .
+   PERFORM q15_a1_2.
+
+
+  ENDFORM.
+FORM q15." Kill Colin?
+ CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Убивать или нет'
+      text_question         = 'Убивать Колина или отпустить его?'
+      text_button_1         = 'Отпустить'(001)
+      text_button_2         = 'Убить'(002)
+      default_button        = '1'
+      display_cancel_button = ''
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+ASSIGN lv_answer to <fs_field_killColin_eq_2>.
+  IF lv_answer = '1'.
+    PERFORM q15_a1.
+  ELSEIF lv_answer = '2'.
+    PERFORM q15_a2.
+  ELSEIF lv_answer = 'A'.
+*    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+ENDFORM.
+
+FORM q15_a1. " Отпускает Колина
+ CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Отпускает его'
+    txt1          = 'Колин благодарит его и говорит: "Спасибо. Я счастилв в этой жизни"'
+    txt2          = 'и добавляет: "Увидимся в следующей жизни"'
+    txt3          = 'Стефан наконец закапывает тело отца'
+    txt4          = 'Слышны сирены полицейских машин'
+      .
+PERFORM q15_a1_2.
+ENDFORM.
+
+FORM q15_a2. " Kills Colin
+  CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Убить?'
+    txt1          = 'Колин понимаеи что бессмысленно сопротивляться '
+    txt2          = 'и просит убить более гуманным способом. Берет в руки статую:'
+    txt3          = '"Вот, попробуй с этим." '
+    txt4          = '"Увидимся в следующей жизни, Сетфан!"'
+      .
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Убивает'
+    txt1          = 'Стефан не может просто так убить'
+    txt2          = 'Колин: "Давай! Прямо в голову!"'
+    txt3          = 'Стефан убивает Колина'
+*    txt4          = ''
+      .
+PERFORM q15_a1_2.
+ENDFORM.
+
+FORM q15_a1_2. " конец №4 с тремя альтернативными концовками
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Конец'
+    txt1          = 'Репортер говорит о том что Брандашмыг (Bandersnatch) '
+    txt2          = 'так и не вышел. Что она, наоборот, навредила компании.'
+*    txt3          = ''
+*    txt4          = ''
+      .
+
+IF <fs_field_lsd_eq_2> is NOT ASSIGNED AND <fs_field_lsd_eq_2> eq 2.
+
+    CALL FUNCTION 'POPUP_TO_INFORM' " standard
+  EXPORTING
+    titel         = 'Конец'
+    txt2          = 'Убийство ставонится явной. Помиио этого Колин исчез.'
+    txt1          = 'CEO комапании (Махан Такур) защищает себя и интересы компании.'
+    txt3          = 'Стефан рассказал копам что видел в своих видениях как Колин совершил суицид'
+    txt4          = 'Tuckersoft закрывается. Стефан за всем этим наблюдает с тюрьмы'
+      .
+      counter = counter + 5. " 70MINS
+      num_end = num_end + 1.
+      PERFORM konec.
+      " INSEERT LOGIC FOR LSD(RED)
+
+ ELSEIF   <fs_field_lsd_eq_2> IS ASSIGNED or <fs_field_lsd_eq_2> eq 1.
+
+  IF <fs_field_killColin_eq_2> eq 1.
+
+CALL FUNCTION 'POPUP_TO_INFORM' " standard
+  EXPORTING
+    titel         = 'Конец'
+    txt1          = 'Колин: "Я бы сказал Стефану все заново сделать. Но в этой жизни. Он в тюрьме."'
+    txt2          = 'CEO комапании (Махан Такур) защищает себя и интересы компании.'
+    txt3          = 'После Колина аррестовывают за хранение наркотиков'
+    txt4          = 'Tuckersoft закрывается'
+      .
+    ELSEIF <fs_field_killColin_eq_2> EQ 2.
+      CALL FUNCTION 'POPUP_TO_INFORM' " standard
+  EXPORTING
+    titel         = 'Конец'
+    txt1          = 'Колин мертв, в то время как CEO (Махан Такур) рассказывает'
+    txt2          = 'что он "ненавидит" тот факт что он мертв. '
+    txt3          = 'Ведь он(Колин) мог бы разрулить ситуацию. '
+    txt4          = 'Tuckersoft закрывается'
+      .
+    ENDIF.
+   ENDIF.
+   num_end = num_end + 1.
+PERFORM konec.
+ENDFORM.
+
+
+FORM q14_a2. " Нет, код не будет готов
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Нет'
+    txt1          = 'Такур: "Нет? Жестоко. Что значит нет?"'
+    txt2          = '"Мне нужен код! Ты подписывал контракт. Чтобы к концу дня было готово!"'
+    txt3          = 'Такур(обращяясь к Колину): "Я покажу ему что значит "нет."'
+    txt4          = 'И направляется к нему домой'
+      .
+PERFORM q14_a2_2.
+ENDFORM.
+
+FORM q14_a2_2. " Spephen kills CEO (the end)
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Такур приходит к нему домой'
+    txt1          = 'Такур приходит к нему домой и вламывается в дом: "Покажи мне что ты сделал? "'
+    txt2          = 'Стефан:"Ничего!" Такур:"что? Что я должен показать всем? Гре*** видеокассету?"'
+    txt3          = 'Такур обнаруживает мертвое тело отца Стефана и видит нож у него в руках.'
+    txt4          = 'Стефан расправляется с ним.'
+      .
+PERFORM q15_a1_2.
+
+ENDFORM.
+
+
+FORM q13_a2. " расчленить отца
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Расчленить'
+    txt1          = 'Звонит Доктору Хэйнс, а она занята с другим клиентом. Записывается на завтра.'
+    txt2          = 'Такур не может дозвониться Стефану. Колин советует ему пусть Стефан доделает'
+    txt3          = 'Дедлайн(срок) продлен еще на 24 часа.'
+    txt4          = 'Настал следующий день. Визит к психологу'
+      .
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'На приеме у псиихолога'
+    txt1          = 'Психолог:"Как твой отец?" Cтефан: "Он уехал к гости с сестре во францию." '
+    txt2          = ' (вспоминает как он отрезает его тело в ванной) '
+    txt3          = '"Это хорошо что его нет. Я спокойно доработал свой код с полным пониманием цели.'
+    txt4          = 'Даже придумал новый поворот в игре. Закончил игру, доставил, дело сделано."'
+      .
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Стефан говорит об игре'
+    txt1          = 'Раньше игрок контролировал слишком много'
+    txt2          = 'Я вернулся к началу и много чего упростил.'
+    txt3          = 'Теперь у игрока иллюзия права выбора, но в действительности я решаю концовку.'
+    txt4          = 'Доктор Хэйнс спрашиват: "А концовка-то счастливая?"'
+      .
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Счастливый конец'
+    txt1          = 'Стефан: "По-моему, да"'
+    txt2          = 'Игра (Bandersnatch) выходит и в популярном телеобзоре игру c рэйтингом 5 из 5.'
+    txt3          = 'Превосходная игра'
+    txt4          = '(Сцена: Комната зарисована с выборками, белый медьведь в крови и голова отца)'
+      .
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Печальный конец'
+    txt1          = 'Но вскоре после ее выхода стал известен мрачный секрет.'
+    txt2          = 'Как оказалось,Стефан Батлер, убил своего отца.'
+    txt3          = 'Игра была изъята из продажи, а все копии - уничтожены.'
+*    txt4          = ''
+      .
+
+CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = 'Новое продолжение'
+    txt1          = 'Но сейчас новый программист хочет создать совремнную версию игры'
+    txt2          = 'Ее отец был программистом (намеки на Колина) и нашла она эту игру в старом ящике'
+    txt3          = 'Она хочет сделать переделать игру и сделать ее со свободой выбора'
+    txt4          = 'и разрабатывает для систем потокового мультимедия (ходят слухи - для Netflix-а)'
+      .
+ CALL FUNCTION 'POPUP_TO_INFORM'
+  EXPORTING
+    titel         = ''
+    txt1          = 'Она разрабатывет различные версии концовок в своем интерактивном фильме'
+    txt2          = 'Но все заканчивается тем что она перестает смотрет весь эпизод вылетает(сбой) '
+    txt3          = '(перестает играть которую она запустила программу ZBANDERSNATCH через SE38)'
+    txt4          = ' Она нервничает. А на экране появляется символ белого медведя'
+      .
+
+      counter = counter + 10. " 75MINS
+PERFORM q13_a2_1.
+ENDFORM.
+
+
+FORM q13_a2_1. " Конец для нового кодера #5
+ CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+      titlebar              = 'Вылить чай или сломать компьютер'
+      text_question         = 'Что ей следует сделать: Вылыть чай на клавиатуру или сломать копьютер?'
+      text_button_1         = 'Вылить'(001)
+      text_button_2         = 'Сломать'(002)
+      default_button        = '1'
+      display_cancel_button = ''
+     START_COLUMN          = 25
+     START_ROW             = 6
+    IMPORTING
+      answer                = lv_answer
+    EXCEPTIONS
+      text_not_found        = 1
+      OTHERS                = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  IF lv_answer = '1'.
+    MESSAGE 'Она выливает чашку чая на клавиатур. Конец' TYPE 'I'.
+    num_end = num_end + 1.
+    PERFORM konec.
+  ELSEIF lv_answer = '2'.
+    MESSAGE 'Она ломает компьютер. Конец.' TYPE 'I'.
+    num_end = num_end + 1.
+    PERFORM konec.
+  ELSEIF lv_answer = 'A'.
+    WRITE: /'Abort mission it is'.
+    PERFORM cancel.
+  ENDIF.
+  num_end = num_end + 1.
+  PERFORM konec.
+ENDFORM.
